@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Leitor</string>
+    <string name="read">Ler</string>
+    <string name="settings">Configurações</string>
+    <string name="koreader_missing">KOReader não está instalado.</string>
+</resources>
