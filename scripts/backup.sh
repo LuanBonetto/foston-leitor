@@ -52,6 +52,10 @@ for p in nanda nandb nandc nandd nande nandf nandg nandh nandi nandj; do
 
   if [ "$p" = "nande" ]; then
     "$ADB" shell "mount -o remount,ro /data" >/dev/null
+    # adbd doesn't propagate the remote exit code, so a failed remount would
+    # otherwise go unnoticed: check the actual mount state.
+    "$ADB" shell "mount" | tr -d '\r' | grep " /data " | grep -q " ro," \
+      || die "não consegui deixar /data somente leitura"
   fi
 
   img="$OUT/$p.img"
@@ -76,6 +80,8 @@ for p in nanda nandb nandc nandd nande nandf nandg nandh nandi nandj; do
 
   if [ "$p" = "nande" ]; then
     "$ADB" shell "mount -o remount,rw /data" >/dev/null
+    "$ADB" shell "mount" | tr -d '\r' | grep " /data " | grep -q " rw," \
+      || die "não consegui remontar /data como leitura-escrita"
   fi
 
   [ "$dev_md5" = "$pc_md5" ] || die "$p: md5 diferente ($dev_md5 vs $pc_md5)"
