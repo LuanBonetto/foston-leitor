@@ -1,0 +1,4 @@
+# Desbloqueio por rosto e papéis de parede animados.
+com.android.facelock
+com.android.wallpaper
+com.android.wallpaper.livepicker

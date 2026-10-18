@@ -1,0 +1,12 @@
+# Google: contas, sincronização, busca, localização.
+com.google.android.gm
+com.google.android.syncadapters.calendar
+com.google.android.syncadapters.contacts
+com.google.android.feedback
+com.google.android.gsf.login
+com.google.android.gsf
+com.google.android.partnersetup
+com.google.android.googlequicksearchbox
+com.google.android.apps.uploader
+com.google.android.location
+com.android.vending.updater

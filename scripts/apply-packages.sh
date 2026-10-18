@@ -8,8 +8,8 @@ require_device
 
 grep -v -E '^\s*(#|$)' "$file" | while read -r pkg; do
   case "$action" in
-    uninstall) result=$("$ADB" uninstall "$pkg" | tr -d '\r') ;;
-    disable|enable) result=$("$ADB" shell "pm $action $pkg" | tr -d '\r') ;;
+    uninstall) result=$("$ADB" uninstall "$pkg" </dev/null | tr -d '\r') ;;
+    disable|enable) result=$("$ADB" shell "pm $action $pkg" </dev/null | tr -d '\r') ;;
     *) die "ação inválida: $action" ;;
   esac
   echo "$pkg: $result"

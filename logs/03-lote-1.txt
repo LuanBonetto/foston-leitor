@@ -1,0 +1,22 @@
+rotulo: 03-lote-1
+data: 2026-10-18T13:28:33-03:00
+boot_completed: 1
+wifi: ok
+MemTotal:         361936 kB
+MemFree:          118516 kB
+Cached:           135544 kB
+processos: 80
+apps_ativos:
+  android.process.acore
+  android.process.media
+  com.android.calendar
+  com.android.deskclock
+  com.android.email
+  com.android.exchange
+  com.android.inputmethod.latin
+  com.android.launcher
+  com.android.phone
+  com.android.providers.calendar
+  com.android.settings
+  com.android.smspush
+  com.android.systemui
