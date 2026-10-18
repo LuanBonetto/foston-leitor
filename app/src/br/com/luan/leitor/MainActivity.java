@@ -49,6 +49,11 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        // Home screen: Back has nowhere to go.
+    }
+
     private void openReader() {
         Intent intent = getPackageManager().getLaunchIntentForPackage(KOREADER_PACKAGE);
         if (intent == null) {
