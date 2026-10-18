@@ -1,0 +1,21 @@
+rotulo: 02-apos-remove
+data: 2026-10-18T13:25:11-03:00
+boot_completed: 1
+wifi: ok
+MemTotal:         361936 kB
+MemFree:          125736 kB
+Cached:           132364 kB
+processos: 80
+apps_ativos:
+  android.process.acore
+  android.process.media
+  com.android.inputmethod.latin
+  com.android.launcher
+  com.android.phone
+  com.android.providers.calendar
+  com.android.settings
+  com.android.smspush
+  com.android.systemui
+  com.google.android.gsf.login
+  com.google.android.partnersetup
+  com.google.process.gapps

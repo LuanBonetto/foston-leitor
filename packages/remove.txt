@@ -1,0 +1,13 @@
+# Apps instalados em /data/app. Saem de vez com adb uninstall.
+com.adobe.flashplayer
+com.android.vending
+com.dataviz.docstogo
+com.google.android.gms
+com.google.android.voicesearch
+com.google.android.youtube
+com.instagram.android
+com.opera.mini.native
+com.skype.raider
+com.spb.shell3d
+miyowa.android.microsoft.wlm
+yuku.mp3recorder.full
