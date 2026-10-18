@@ -7,6 +7,18 @@ CHUNK_MB=64
 BUSYBOX_URL=https://busybox.net/downloads/binaries/1.31.0-defconfig-multiarch-musl/busybox-armv7l
 
 require_device
+
+# Always leave /data read-write and the framework running, no matter how the
+# script exits (success, die(), or a signal while a chunk is mid-copy).
+cleanup_done=0
+cleanup() {
+  [ "$cleanup_done" = 1 ] && return
+  cleanup_done=1
+  "$ADB" shell "mount -o remount,rw /data" >/dev/null 2>&1 || true
+  "$ADB" shell start >/dev/null 2>&1 || true
+}
+trap cleanup EXIT INT TERM
+
 mkdir -p "$OUT"
 
 if ! "$ADB" shell "[ -x $BB ] && echo ok" | grep -q ok; then
@@ -15,29 +27,57 @@ if ! "$ADB" shell "[ -x $BB ] && echo ok" | grep -q ok; then
   "$ADB" shell "chmod 755 $BB"
 fi
 
+# vdc talks to vold, not to the framework, so this must run before `stop`.
 sdcard_mount
 "$ADB" shell "pm list packages -f" | tr -d '\r' > "$OUT/packages.txt"
 "$ADB" shell getprop | tr -d '\r' > "$OUT/getprop.txt"
 "$ADB" pull /system/build.prop "$OUT/build.prop"
 "$ADB" pull /system/etc/vold.fstab "$OUT/vold.fstab"
 
+# Stop the framework so nothing is writing to /data while we image it.
+"$ADB" shell stop >/dev/null
+"$ADB" shell sync >/dev/null
+
 for p in nanda nandb nandc nandd nande nandf nandg nandh nandi nandj; do
+  if [ -f "$OUT/$p.md5" ]; then
+    echo "skip $p (md5 existente)"
+    continue
+  fi
+
+  # Never stage a chunk on the partition being copied: that would write to the
+  # very device we're reading. /cache (nandh) is the default staging ground;
+  # for nandh itself, stage on /data (nande) instead.
+  stage=/cache/chunk
+  [ "$p" = "nandh" ] && stage=/data/local/tmp/chunk
+
+  if [ "$p" = "nande" ]; then
+    "$ADB" shell "mount -o remount,ro /data" >/dev/null
+  fi
+
   img="$OUT/$p.img"
   kb=$("$ADB" shell "cat /proc/partitions" | tr -d '\r' | awk -v p="$p" '$4==p {print $3}')
   [ -n "$kb" ] || die "partição $p não encontrada"
   chunks=$(( (kb / 1024 + CHUNK_MB - 1) / CHUNK_MB ))
   : > "$img"
   for ((i = 0; i < chunks; i++)); do
-    "$ADB" shell "dd if=/dev/block/$p of=/data/local/tmp/chunk bs=1048576 skip=$((i * CHUNK_MB)) count=$CHUNK_MB 2>/dev/null"
-    "$ADB" pull /data/local/tmp/chunk "$OUT/chunk" 2>/dev/null
+    "$ADB" shell "dd if=/dev/block/$p of=$stage bs=1048576 skip=$((i * CHUNK_MB)) count=$CHUNK_MB 2>/dev/null"
+    "$ADB" pull "$stage" "$OUT/chunk" 2>/dev/null
     cat "$OUT/chunk" >> "$img"
   done
-  "$ADB" shell "rm -f /data/local/tmp/chunk"; rm -f "$OUT/chunk"
+  # Android's toolbox rm has no -f; silence it in case the chunk is missing.
+  "$ADB" shell "rm $stage" >/dev/null 2>&1
+  rm -f "$OUT/chunk"
 
   size=$(stat -c %s "$img")
   [ "$size" -eq $((kb * 1024)) ] || die "$p: tamanho $size != $((kb * 1024))"
+  # busybox lives on /data; reading it while /data is read-only is fine.
   dev_md5=$("$ADB" shell "$BB md5sum /dev/block/$p" | tr -d '\r' | cut -d' ' -f1)
   pc_md5=$(md5sum "$img" | cut -d' ' -f1)
+
+  if [ "$p" = "nande" ]; then
+    "$ADB" shell "mount -o remount,rw /data" >/dev/null
+  fi
+
   [ "$dev_md5" = "$pc_md5" ] || die "$p: md5 diferente ($dev_md5 vs $pc_md5)"
   echo "$pc_md5  $p.img" > "$OUT/$p.md5"
   echo "ok $p ($((kb / 1024)) MiB) $pc_md5"
