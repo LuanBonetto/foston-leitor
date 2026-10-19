@@ -5,6 +5,7 @@ source "$(dirname "$0")/lib.sh"
 VERSION=v2023.06
 APK_URL="https://github.com/koreader/koreader/releases/download/$VERSION/koreader-android-arm-$VERSION.apk"
 APK_SIZE=32648511
+APK_SHA256=ae0effe42763938981514349acba3c5eae22b37d855933e6251ed51c41ff8adc
 PKG=org.koreader.launcher
 ACTIVITY=.MainActivity
 CACHE="$HOME/.cache/foston-leitor"
@@ -13,8 +14,12 @@ SETTINGS=/mnt/sdcard/koreader/settings.reader.lua
 require_device
 mkdir -p "$CACHE"
 apk="$CACHE/koreader-$VERSION.apk"
-[ -f "$apk" ] || curl -fL -o "$apk" "$APK_URL"
+if [ ! -f "$apk" ]; then
+  curl -fL -o "$apk.part" "$APK_URL"
+  mv "$apk.part" "$apk"
+fi
 [ "$(stat -c %s "$apk")" -eq "$APK_SIZE" ] || die "APK com tamanho inesperado"
+[ "$(sha256sum "$apk" | cut -d' ' -f1)" = "$APK_SHA256" ] || die "APK: sha256 não confere"
 
 install_out="$("$ADB" install -r "$apk" </dev/null | tr -d '\r')"
 echo "$install_out" | grep -q Success || die "adb install falhou"

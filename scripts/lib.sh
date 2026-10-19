@@ -1,12 +1,23 @@
 #!/usr/bin/env bash
 # Shared helpers for every device script. Source, do not run.
+#
+# Run order for setting up a tablet from scratch:
+#   backup.sh
+#   apply-packages.sh uninstall remove.txt
+#   apply-packages.sh disable disable-1..3
+#   install-koreader.sh
+#   setup-toolchain.sh
+#   app/build.sh
+#   adb install app/build/leitor.apk
+#   apply-packages.sh disable disable-4-launcher.txt
 set -euo pipefail
 
+die() { echo "ERRO: $*" >&2; exit 1; }
+
 ADB="${ADB:-$HOME/.local/opt/platform-tools/adb}"
+[ -x "$ADB" ] || die "adb não encontrado em $ADB (instale platform-tools)"
 BB=/data/local/tmp/busybox
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-
-die() { echo "ERRO: $*" >&2; exit 1; }
 
 require_device() {
   "$ADB" get-state >/dev/null 2>&1 || die "tablet não encontrado pelo adb"

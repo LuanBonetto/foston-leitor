@@ -1,4 +1,6 @@
-# Apps instalados em /data/app. Saem de vez com adb uninstall.
+# Apps instalados em /data/app. A maioria sai de vez com adb uninstall; um
+# app de sistema com atualização (com.android.vending, aqui) só volta para a
+# cópia original em /system.
 com.adobe.flashplayer
 com.android.vending
 com.dataviz.docstogo

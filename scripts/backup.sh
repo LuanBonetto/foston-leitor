@@ -5,6 +5,7 @@ source "$(dirname "$0")/lib.sh"
 OUT="${1:-$HOME/foston-backup/2026-10-16}"
 CHUNK_MB=64
 BUSYBOX_URL=https://busybox.net/downloads/binaries/1.31.0-defconfig-multiarch-musl/busybox-armv7l
+BUSYBOX_SHA256=cd04052b8b6885f75f50b2a280bfcbf849d8710c8e61d369c533acf307eda064
 
 require_device
 
@@ -21,8 +22,11 @@ trap cleanup EXIT INT TERM
 
 mkdir -p "$OUT"
 
-if ! "$ADB" shell "[ -x $BB ] && echo ok" | grep -q ok; then
-  curl -fsSL -o "$OUT/busybox" "$BUSYBOX_URL"
+if [ "$("$ADB" shell "[ -x $BB ] && echo ok" | tr -d '\r')" != ok ]; then
+  curl -fsSL -o "$OUT/busybox.part" "$BUSYBOX_URL"
+  [ "$(sha256sum "$OUT/busybox.part" | cut -d' ' -f1)" = "$BUSYBOX_SHA256" ] \
+    || die "busybox: sha256 não confere"
+  mv "$OUT/busybox.part" "$OUT/busybox"
   "$ADB" push "$OUT/busybox" "$BB"
   "$ADB" shell "chmod 755 $BB"
 fi
@@ -70,6 +74,7 @@ for p in nanda nandb nandc nandd nande nandf nandg nandh nandi nandj; do
   done
   # Android's toolbox rm has no -f; silence it in case the chunk is missing.
   "$ADB" shell "rm $stage" >/dev/null 2>&1
+  "$ADB" shell sync >/dev/null
   rm -f "$OUT/chunk"
 
   size=$(stat -c %s "$img")

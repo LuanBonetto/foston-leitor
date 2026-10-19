@@ -5,11 +5,18 @@ set -euo pipefail
 OPT="$HOME/.local/opt"
 JDK="$OPT/jdk-21"
 SDK="$OPT/android-sdk"
+PLATFORM_TOOLS="$OPT/platform-tools"
 TOOLS_ZIP=commandlinetools-linux-16111833_latest.zip
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
 mkdir -p "$OPT"
+if [ ! -x "$PLATFORM_TOOLS/adb" ]; then
+  curl -fL -o "$TMP/platform-tools.zip" \
+    "https://dl.google.com/android/repository/platform-tools-latest-linux.zip"
+  unzip -q "$TMP/platform-tools.zip" -d "$OPT"
+fi
+
 if [ ! -x "$JDK/bin/javac" ]; then
   curl -fL -o "$TMP/jdk.tar.gz" \
     "https://api.adoptium.net/v3/binary/latest/21/ga/linux/x64/jdk/hotspot/normal/eclipse"
