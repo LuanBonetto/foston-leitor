@@ -2,11 +2,11 @@
 # Shared helpers for every device script. Source, do not run.
 #
 # Run order for setting up a tablet from scratch:
+#   setup-toolchain.sh   (installs adb, JDK and Android SDK into ~/.local/opt)
 #   backup.sh
 #   apply-packages.sh uninstall remove.txt
 #   apply-packages.sh disable disable-1..3
 #   install-koreader.sh
-#   setup-toolchain.sh
 #   app/build.sh
 #   adb install app/build/leitor.apk
 #   apply-packages.sh disable disable-4-launcher.txt
