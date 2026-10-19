@@ -1,0 +1,18 @@
+rotulo: 06-final
+data: 2026-10-19T13:35:30-03:00
+boot_completed: 1
+wifi: 
+MemTotal:         361936 kB
+MemFree:          167056 kB
+Cached:           120148 kB
+processos: 74
+apps_ativos:
+  android.process.acore
+  android.process.media
+  br.com.luan.leitor
+  com.android.inputmethod.latin
+  com.android.phone
+  com.android.settings
+  com.android.smspush
+  com.android.systemui
+  org.koreader.launcher

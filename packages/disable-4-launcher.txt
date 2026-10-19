@@ -1,0 +1,2 @@
+# Só depois que o Leitor passou nos testes da Task 5.
+com.android.launcher
