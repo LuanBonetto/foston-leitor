@@ -10,3 +10,6 @@ com.google.android.googlequicksearchbox
 com.google.android.apps.uploader
 com.google.android.location
 com.android.vending.updater
+
+# Play Store: o adb uninstall só tirou a atualização; a cópia de /system fica desativada.
+com.android.vending
